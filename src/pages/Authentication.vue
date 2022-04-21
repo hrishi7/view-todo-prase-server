@@ -1,18 +1,31 @@
 <script setup lang="ts">
 import { reactive, ref } from '@vue/reactivity';
+import { logIn, signUp } from 'src/services/auth';
+
+import { useRouter } from 'vue-router';
+
+import { required, short, isEmail } from 'src/utils/auth';
+import { showNotify } from 'src/utils/common';
+import { useQuasar } from 'quasar';
 
 type FormView = 'SIGNIN' | 'SIGNUP';
 type PasswordViewType = 'text' | 'password';
 
 const credientials = reactive({
   email: '',
+  name: '',
   username: '',
   password: '',
-  rePassword: '',
 });
+const q = useQuasar();
+const rePassword = ref('');
+const submitting = ref(false);
 const formView = ref<FormView>('SIGNUP');
 const passwordFieldView = ref<PasswordViewType>('password');
+
 const rePasswordFieldView = ref<PasswordViewType>('password');
+
+const router = useRouter();
 
 function changeView() {
   if (formView.value == 'SIGNUP') formView.value = 'SIGNIN';
@@ -28,33 +41,46 @@ function reChangePasswordView() {
   else rePasswordFieldView.value = 'text';
 }
 
-function required(val: string) {
-  return (val && val.length > 0) || 'Filed is required';
-}
 function diffPassword(val: string) {
   return (val && val === credientials.password) || 'Password mismatched!';
 }
-function short(val: string) {
-  return (
-    (val && val.length > 3) || 'Password must be more than 3 charecter atleast'
-  );
-}
-function isEmail(val: string) {
-  const emailPattern =
-    /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
-  return emailPattern.test(val) || 'Invalid Email ! please enter correct email';
-}
 
-function onSubmit() {
+async function onSubmit() {
+  submitting.value = true;
+  const { email, name, username, password } = credientials;
   if (formView.value == 'SIGNUP') {
     ////call signup action
+    let signUpCreds = {
+      email,
+      username,
+      name,
+      password,
+    };
+    let response = await signUp(signUpCreds);
+    submitting.value = false;
+    if (response.success) {
+      showNotify(q, response.message, 'positive', 'success');
+      router.push('/all');
+    } else {
+      showNotify(q, response.message, 'negative', 'error');
+    }
   } else {
     //call login action
-  }
-}
 
-function getBtnIcon() {
-  return formView.value == 'SIGNUP' ? 'close' : 'add';
+    let loginCreds = {
+      username,
+      password,
+    };
+    let response = await logIn(loginCreds);
+    submitting.value = false;
+
+    if (response.success) {
+      showNotify(q, response.message, 'positive', 'success');
+      router.push('/all');
+    } else {
+      showNotify(q, response.message, 'negative', 'error');
+    }
+  }
 }
 </script>
 
@@ -66,7 +92,7 @@ function getBtnIcon() {
     >
       <div class="column q-pa-lg">
         <div class="row">
-          <q-card square class="shadow-24" style="width: 400px; height: 540px">
+          <q-card square class="shadow-24" style="width: 400px; height: 600px">
             <q-card-section class="bg-deep-purple-7">
               <h4 class="text-h5 text-white q-my-md">{{ title }}</h4>
             </q-card-section>
@@ -80,15 +106,16 @@ function getBtnIcon() {
               >
                 <!-- <q-tooltip> {{ formView }} </q-tooltip> -->
               </q-fab>
-              <q-form class="q-px-sm q-pt-xl">
+              <q-form @submit.prevent.stop="onSubmit" class="q-px-sm q-pt-xl">
                 <q-input
                   ref="email"
                   square
                   clearable
+                  v-if="formView == 'SIGNUP'"
                   v-model="credientials.email"
                   type="email"
                   lazy-rules
-                  :rules="[this.required, this.isEmail, this.short]"
+                  :rules="[required, isEmail]"
                   label="Email"
                 >
                   <template v-slot:prepend>
@@ -96,13 +123,25 @@ function getBtnIcon() {
                   </template>
                 </q-input>
                 <q-input
-                  ref="username"
+                  ref="name"
                   v-if="formView == 'SIGNUP'"
+                  square
+                  clearable
+                  v-model="credientials.name"
+                  type="text"
+                  label="Full Name"
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="person" />
+                  </template>
+                </q-input>
+                <q-input
+                  ref="username"
                   square
                   clearable
                   v-model="credientials.username"
                   lazy-rules
-                  :rules="[this.required, this.short]"
+                  :rules="[required, short]"
                   type="username"
                   label="Username"
                 >
@@ -117,7 +156,7 @@ function getBtnIcon() {
                   v-model="credientials.password"
                   :type="passwordFieldView"
                   lazy-rules
-                  :rules="[this.required, this.short]"
+                  :rules="[required, short]"
                   label="Password"
                 >
                   <template v-slot:prepend>
@@ -132,14 +171,14 @@ function getBtnIcon() {
                   </template>
                 </q-input>
                 <q-input
-                  ref="repassword"
+                  ref="password2"
                   v-if="formView == 'SIGNUP'"
                   square
                   clearable
-                  v-model="credientials.repassword"
+                  v-model="rePassword"
                   :type="rePasswordFieldView"
                   lazy-rules
-                  :rules="[this.required, this.short, this.diffPassword]"
+                  :rules="[required, short, diffPassword]"
                   label="Re Enter Password"
                 >
                   <template v-slot:prepend>
@@ -153,24 +192,32 @@ function getBtnIcon() {
                     />
                   </template>
                 </q-input>
+                <q-btn
+                  unelevated
+                  size="lg"
+                  color="secondary"
+                  type="submit"
+                  class="full-width text-white"
+                  :label="formView"
+                  :loading="submitting"
+                />
               </q-form>
             </q-card-section>
 
-            <q-card-actions class="q-px-lg">
-              <q-btn
-                unelevated
-                size="lg"
-                color="secondary"
-                @click="submit"
-                class="full-width text-white"
-                :label="formView"
-              />
-            </q-card-actions>
-            <q-card-section
-              v-if="!formView == 'SIGNUP'"
-              class="text-center q-pa-sm"
-            >
-              <p class="text-grey-6">Create Account?</p>
+            <!-- <q-card-actions class="q-px-lg">
+              
+            </q-card-actions> -->
+            <q-card-section class="text-center q-pa-sm">
+              <p
+                class="text-grey-6 cursor-pointer"
+                v-if="formView == 'SIGNIN'"
+                @click="changeView"
+              >
+                Create Account?
+              </p>
+              <p class="text-grey-6 cursor-pointer" v-else @click="changeView">
+                Already have account ! Login
+              </p>
             </q-card-section>
           </q-card>
         </div>

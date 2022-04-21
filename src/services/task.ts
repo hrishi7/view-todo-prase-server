@@ -11,12 +11,12 @@ export const insert = async (newTask: Task) => {
     if (response) {
       // call pinia action to update global store
       taskStore.addTask(response)
-      return 'Task Added. Relax!'
+      return { success: true, message: 'Task Added. Relax!' }
     } else {
-      return 'Server Error! try again later'
+      return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error) {
-    return 'Server Error! try again later'
+  } catch (error: Parse.Error) {
+    return { success: false, message: 'Server Error! try again later' + error.message }
   }
 }
 
@@ -38,29 +38,29 @@ export const update = async (id = '', updatedInfo: Task) => {
       //call pinia action to edit taskStore
 
       taskStore.editTask(id, updatedResponse)
-      return 'Updated';
+      return { success: true, message: 'Task Updated' }
     } else {
-      return 'Server Error! try again later'
+      return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error) {
-    return 'Server Error! try again later'
+  } catch (error: Parse.Error) {
+    return { success: false, message: 'Server Error! try again later' + error.message }
   }
 }
 
-export const deleteTask = async (id = '') => {
+export const remove = async (id = '') => {
   try {
     const q = new Parse.Query('Task');
     const response = await q.get(id);
     const deletedResponse = await response.destroy();
     if (deletedResponse) {
       taskStore.deleteTask(id);
-      return 'Tasked Removed..';
+      return { success: true, message: 'Tasked Removed..' }
     }
     else {
-      return 'Server Error! try again later'
+      return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error) {
-    return 'Server Error! try again later'
+  } catch (error: Parse.Error) {
+    return { success: false, message: 'Server Error! try again later' + error.message }
   }
 
 
@@ -72,9 +72,12 @@ export const getTasks = async () => {
     const response: Parse.Object<Task>[] = await query.find();
     if (response) {
       taskStore.setTasks(response, taskStore.page + 1);
+      return { success: true, message: `${response.length} data Fetched` }
+    } else {
+      return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error) {
-    return { data: [], message: 'Server Error! try again later' }
+  } catch (error: Parse.Error) {
+    return { success: false, message: 'Server Error! try again later' + error.message }
   }
 }
 
@@ -84,10 +87,11 @@ export const getTask = async (id = '') => {
     const response = await query.get(id) as Parse.Object<Task>;
     if (response) {
       taskStore.setTask(response)
+      return { success: true, message: 'data Found' }
     } else {
-      return 'No Data Found';
+      return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error) {
-    return 'Server Error! try again later'
+  } catch (error: Parse.Error) {
+    return { success: false, message: 'Server Error! try again later' + error.message }
   }
 }

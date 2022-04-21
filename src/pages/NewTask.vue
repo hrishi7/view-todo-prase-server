@@ -4,19 +4,24 @@ import Task from 'src/types';
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
-import { useTaskStore } from 'src/stores/task';
 import { insert } from 'src/services/task';
+import { showNotify } from 'src/utils/common';
+import { useQuasar } from 'quasar';
 
-const taskStore = useTaskStore();
-
+const q = useQuasar();
 const task = reactive<Task>({
   title: '',
   description: '',
   completed: false,
 });
 const onSubmit = async () => {
-  let resp = await insert(task);
-  router.push('/');
+  let response = await insert(task);
+  if (response.success) {
+    showNotify(q, response.message, 'positive', 'success');
+    router.push('/all');
+  } else {
+    showNotify(q, response.message, 'negative', 'error');
+  }
 };
 </script>
 

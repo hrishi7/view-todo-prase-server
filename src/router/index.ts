@@ -1,4 +1,5 @@
 import { route } from 'quasar/wrappers';
+
 import {
   createMemoryHistory,
   createRouter,
@@ -32,5 +33,18 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
+  // Router.beforeEach((to, from, next) => {
+  //   if (to.fullPath === '/' || to.fullPath === '/all' || to.fullPath == '/new' || to.fullPath == 'edit/:id') {
+  //     if (!isLoggedIn()) {
+  //       next('/authentication');
+  //     }
+  //   }
+  //   if (to.fullPath === '/authentication') {
+  //     if (isLoggedIn()) {
+  //       next('/all');
+  //     }
+  //   }
+  //   next();
+  // });
   return Router;
 });

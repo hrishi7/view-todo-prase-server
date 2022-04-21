@@ -5,6 +5,8 @@ import Task from 'src/types';
 import { onMounted, reactive } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useTaskStore } from 'src/stores/task';
+import { showNotify } from 'src/utils/common';
+import { useQuasar } from 'quasar';
 
 const taskStore = useTaskStore();
 const router = useRouter();
@@ -15,19 +17,29 @@ const task = reactive<Task>({
   description: '',
   completed: false,
 });
-console.log(route.params);
+const q = useQuasar();
 const onSubmit = async () => {
-  const resp = await update(taskId, task);
-  router.push('/');
+  const response = await update(taskId, task);
+  if (response.success) {
+    showNotify(q, response.message, 'positive', 'success');
+    router.push('/all');
+  } else {
+    showNotify(q, response.message, 'negative', 'error');
+  }
 };
 
 onMounted(async () => {
   if (taskId) {
-    const resp = await getTask(taskId);
-    const { title, description, completed } = taskStore.task.attributes;
-    task.title = title;
-    task.description = description;
-    task.completed = completed;
+    const response = await getTask(taskId);
+    if (response.success) {
+      showNotify(q, response.message, 'positive', 'success');
+      const { title, description, completed } = taskStore.task.attributes;
+      task.title = title;
+      task.description = description;
+      task.completed = completed;
+    } else {
+      showNotify(q, response.message, 'negative', 'error');
+    }
   }
 });
 </script>

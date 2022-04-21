@@ -1,17 +1,37 @@
 <script setup lang="ts">
-import { getTasks } from 'src/services/task';
+import { getTasks, remove } from 'src/services/task';
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ContainerSection from '../components/ContainerSection.vue';
-import TaskCard from '../components/TaskCard.vue';
+import TaskCard from 'src/components/TaskCard.vue';
 import { useTaskStore } from 'src/stores/task';
+import { showNotify } from 'src/utils/common';
+import { useQuasar } from 'quasar';
 
 const taskStore = useTaskStore();
 const router = useRouter();
+const q = useQuasar();
 
 onMounted(async () => {
-  await getTasks();
+  let response = await getTasks();
+  if (response.success) {
+    showNotify(q, response.message, 'positive', 'success');
+  } else {
+    showNotify(q, response.message, 'negative', 'error');
+  }
 });
+async function deleteTask(id: string) {
+  let response = await remove(id);
+
+  if (response.success) {
+    showNotify(q, response.message, 'positive', 'success');
+  } else {
+    showNotify(q, response.message, 'negative', 'error');
+  }
+}
+function editTask(id: string) {
+  router.push(`/edit/${id}`);
+}
 </script>
 
 <template>
@@ -27,7 +47,8 @@ onMounted(async () => {
         v-for="(task, index) in taskStore.tasks"
         :key="index"
         :task="task"
-        @click="router.push(`/edit/${task.id}`)"
+        :deleteTask="deleteTask"
+        :editTask="editTask"
       />
       <div v-if="taskStore.tasks.length == 0">You have no Tasks..</div>
     </ContainerSection>
