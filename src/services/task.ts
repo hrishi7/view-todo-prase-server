@@ -7,7 +7,7 @@ const taskStore = useTaskStore();
 export const insert = async (newTask: Task) => {
   try {
     const task = new Parse.Object('Task') as Parse.Object<Task>;
-    const response = await task.save(newTask);
+    const response = await task.save(newTask) as Parse.Object<Task>;
     if (response) {
       // call pinia action to update global store
       taskStore.addTask(response)
@@ -20,10 +20,10 @@ export const insert = async (newTask: Task) => {
   }
 }
 
-export const update = async (id = '', updatedInfo: Task) => {
+export const update = async (id: string, updatedInfo: Task) => {
   try {
-    const q = new Parse.Query('Task');
-    const response = await q.get(id);
+    const q = new Parse.Query('Task') as Parse.Query;
+    const response: Parse.Object<Task> = await q.get(id);
     if (updatedInfo.title) {
       response.set('title', updatedInfo.title);
     }
@@ -34,7 +34,7 @@ export const update = async (id = '', updatedInfo: Task) => {
       response.set('completed', updatedInfo.completed);
     }
     const updatedResponse = await response.save() as Parse.Object<Task>;
-    if (response) {
+    if (updatedResponse) {
       //call pinia action to edit taskStore
 
       taskStore.editTask(id, updatedResponse)
@@ -49,9 +49,9 @@ export const update = async (id = '', updatedInfo: Task) => {
 
 export const remove = async (id = '') => {
   try {
-    const q = new Parse.Query('Task');
-    const response = await q.get(id);
-    const deletedResponse = await response.destroy();
+    const q = new Parse.Query('Task') as Parse.Query;
+    const response: Parse.Object<Task> = await q.get(id);
+    const deletedResponse: Parse.Object<Task> = await response.destroy();
     if (deletedResponse) {
       taskStore.deleteTask(id);
       return { success: true, message: 'Tasked Removed..' }
@@ -68,7 +68,7 @@ export const remove = async (id = '') => {
 
 export const getTasks = async () => {
   try {
-    const query = new Parse.Query('Task');
+    const query = new Parse.Query('Task') as Parse.Query;
     const response: Parse.Object<Task>[] = await query.find();
     if (response) {
       taskStore.setTasks(response, taskStore.page + 1);
@@ -81,10 +81,10 @@ export const getTasks = async () => {
   }
 }
 
-export const getTask = async (id = '') => {
+export const getTask = async (id: string) => {
   try {
-    const query = new Parse.Query('Task');
-    const response = await query.get(id) as Parse.Object<Task>;
+    const q = new Parse.Query('Task') as Parse.Query;
+    const response: Parse.Object<Task> = await q.get(id);
     if (response) {
       taskStore.setTask(response)
       return { success: true, message: 'data Found' }

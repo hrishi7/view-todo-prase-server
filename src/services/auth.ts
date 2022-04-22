@@ -36,13 +36,13 @@ export const logOut = async () => {
         await Parse.User.logOut()
         const currentUser = Parse.User.current();  // this will now be null
         if (currentUser == null) {
-            return 'Logout Successfully'
+            return { success: true, message: 'Logout Successfully' }
         } else {
-            return 'Server Error! try again later'
+            return { success: false, message: 'Server Error! try again later' }
         }
 
     } catch (error) {
-        return 'Server Error! try again later'
+        return { success: false, message: 'Server Error! try again later' }
     }
 }
 

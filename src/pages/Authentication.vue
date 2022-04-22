@@ -204,9 +204,6 @@ async function onSubmit() {
               </q-form>
             </q-card-section>
 
-            <!-- <q-card-actions class="q-px-lg">
-              
-            </q-card-actions> -->
             <q-card-section class="text-center q-pa-sm">
               <p
                 class="text-grey-6 cursor-pointer"

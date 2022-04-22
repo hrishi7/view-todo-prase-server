@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import Parse from 'src/config/config';
+import Parse from 'parse/dist/parse.min';
 import Task from 'src/types';
-const props = defineProps<{
+type PropsType = {
   task: Parse.Object<Task>;
   deleteTask: () => void;
   editTask: () => void;
-}>();
+};
+const props = defineProps<PropsType>();
 </script>
 
 <template>
