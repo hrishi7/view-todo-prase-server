@@ -15,22 +15,23 @@ export const insert = async (newTask: Task) => {
     } else {
       return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error: Parse.Error) {
+  } catch (err) {
+    const error = err as Parse.Error;
     return { success: false, message: 'Server Error! try again later' + error.message }
   }
 }
 
-export const update = async (id: string, updatedInfo: Task) => {
+export const update = async (id: string, updatedInfo: Task | null) => {
   try {
     const q = new Parse.Query('Task') as Parse.Query;
-    const response: Parse.Object<Task> = await q.get(id);
-    if (updatedInfo.title) {
+    const response = await q.get(id) as Parse.Object<Task>;
+    if (updatedInfo && updatedInfo.title) {
       response.set('title', updatedInfo.title);
     }
-    if (updatedInfo.description) {
+    if (updatedInfo && updatedInfo.description) {
       response.set('description', updatedInfo.description);
     }
-    if (updatedInfo.completed != undefined) {
+    if (updatedInfo && updatedInfo.completed != undefined) {
       response.set('completed', updatedInfo.completed);
     }
     const updatedResponse = await response.save() as Parse.Object<Task>;
@@ -42,7 +43,8 @@ export const update = async (id: string, updatedInfo: Task) => {
     } else {
       return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error: Parse.Error) {
+  } catch (err) {
+    const error = err as Parse.Error;
     return { success: false, message: 'Server Error! try again later' + error.message }
   }
 }
@@ -50,7 +52,7 @@ export const update = async (id: string, updatedInfo: Task) => {
 export const remove = async (id = '') => {
   try {
     const q = new Parse.Query('Task') as Parse.Query;
-    const response: Parse.Object<Task> = await q.get(id);
+    const response = await q.get(id) as Parse.Object<Task>;
     const deletedResponse: Parse.Object<Task> = await response.destroy();
     if (deletedResponse) {
       taskStore.deleteTask(id);
@@ -59,7 +61,8 @@ export const remove = async (id = '') => {
     else {
       return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error: Parse.Error) {
+  } catch (err) {
+    const error = err as Parse.Error;
     return { success: false, message: 'Server Error! try again later' + error.message }
   }
 
@@ -69,14 +72,15 @@ export const remove = async (id = '') => {
 export const getTasks = async () => {
   try {
     const query = new Parse.Query('Task') as Parse.Query;
-    const response: Parse.Object<Task>[] = await query.find();
+    const response = await query.find() as Parse.Object<Task>[];
     if (response) {
       taskStore.setTasks(response, taskStore.page + 1);
       return { success: true, message: `${response.length} data Fetched` }
     } else {
       return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error: Parse.Error) {
+  } catch (err) {
+    const error = err as Parse.Error;
     return { success: false, message: 'Server Error! try again later' + error.message }
   }
 }
@@ -84,14 +88,15 @@ export const getTasks = async () => {
 export const getTask = async (id: string) => {
   try {
     const q = new Parse.Query('Task') as Parse.Query;
-    const response: Parse.Object<Task> = await q.get(id);
+    const response = await q.get(id) as Parse.Object<Task>;
     if (response) {
       taskStore.setTask(response)
       return { success: true, message: 'data Found' }
     } else {
       return { success: false, message: 'Server Error! try again later' }
     }
-  } catch (error: Parse.Error) {
+  } catch (err) {
+    const error = err as Parse.Error;
     return { success: false, message: 'Server Error! try again later' + error.message }
   }
 }

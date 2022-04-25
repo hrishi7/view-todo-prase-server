@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
-import Task from 'src/types';
+import type Task from 'src/types';
 import Parse from '../config/config';
 
 
 interface State {
   tasks: Array<Parse.Object<Task>>;
-  task: Parse.Object<Task>;
+  task: Parse.Object<Task> | null;
   page: number;
   limit: number;
 }

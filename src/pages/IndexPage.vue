@@ -8,20 +8,21 @@ import { useTaskStore } from 'src/stores/task';
 import { showNotify } from 'src/utils/common';
 import { useQuasar } from 'quasar';
 
+type FilterType = 'All' | 'Pending' | 'Completed';
+
+
 const taskStore = useTaskStore();
 const router = useRouter();
 const q = useQuasar();
 
-const deletedId = ref('');
-const modalActive = ref(false);
-
-type FilterType = 'All' | 'Pending' | 'Completed';
-const model = ref<FilterType>('All');
 const options = ['All', 'Pending', 'Completed'];
 
-const toggleModal = () => {
-  modalActive.value = !modalActive.value;
-};
+const deletedId = ref('');
+const modalActive = ref(false);
+const model = ref<FilterType>('All');
+
+//place for conputed
+//place for watcher methods
 
 onMounted(async () => {
   let response = await getTasks();
@@ -31,6 +32,12 @@ onMounted(async () => {
     showNotify(q, response.message, 'negative', 'error');
   }
 });
+
+const toggleModal = () => {
+  modalActive.value = !modalActive.value;
+};
+
+
 function deleteTask(id: string) {
   deletedId.value = id;
   toggleModal();
@@ -89,7 +96,7 @@ function applyFilter() {
         v-for="(task, index) in applyFilter()"
         :key="index"
         :task="task"
-        :deleteTask="deleteTask"
+        @deleteTask="deleteTask"
         :editTask="editTask"
       />
       <div v-if="taskStore.tasks.length == 0">You have no Tasks..</div>

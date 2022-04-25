@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Parse from 'parse/dist/parse.min';
 import Task from 'src/types';
-type PropsType = {
+interface PropsType  {
   task: Parse.Object<Task>;
   deleteTask: () => void;
   editTask: () => void;

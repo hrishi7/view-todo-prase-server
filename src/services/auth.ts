@@ -5,14 +5,15 @@ type LoginCred = Omit<Credential, 'email'>
 
 export const signUp = async (credientials: Credential) => {
     try {
-        const user = new Parse.User();
+        const user: Parse.User = new Parse.User();
         const response = await user.signUp(credientials)
         if (response) {
             return { success: true, message: 'SignUp & login Sucessfully!' }
         } else {
             return { success: false, message: 'Server Error! try again later' }
         }
-    } catch (error: Parse.Error) {
+    } catch (err) {
+        const error = err as Parse.Error;
         return { success: false, message: 'Server Error! try again later - ' + error.message }
     }
 }
@@ -20,13 +21,14 @@ export const signUp = async (credientials: Credential) => {
 export const logIn = async (credientials: LoginCred) => {
     console.log(credientials)
     try {
-        const response: Parse.User<Credential> = await Parse.User.logIn(credientials.username, credientials.password)
+        const response = await Parse.User.logIn(credientials.username, credientials.password)
         if (response) {
             return { success: true, message: 'Loggedin Sucessfully!' }
         } else {
             return { success: false, message: 'Server Error! try again later' }
         }
-    } catch (error: Parse.Error) {
+    } catch (err) {
+        const error = err as Parse.Error;
         return { success: false, message: 'Server Error! try again later - ' + error.message }
     }
 }
@@ -41,8 +43,9 @@ export const logOut = async () => {
             return { success: false, message: 'Server Error! try again later' }
         }
 
-    } catch (error) {
-        return { success: false, message: 'Server Error! try again later' }
+    } catch (err) {
+        const error = err as Parse.Error;
+        return { success: false, message: 'Server Error! try again later'+ error.message }
     }
 }
 

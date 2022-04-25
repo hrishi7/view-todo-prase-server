@@ -94,7 +94,7 @@ async function onSubmit() {
         <div class="row">
           <q-card square class="shadow-24" style="width: 400px; height: 600px">
             <q-card-section class="bg-deep-purple-7">
-              <h4 class="text-h5 text-white q-my-md">{{ title }}</h4>
+              <h4 class="text-h5 text-white q-my-md">{{ formView }}</h4>
             </q-card-section>
             <q-card-section>
               <q-fab
@@ -142,7 +142,7 @@ async function onSubmit() {
                   v-model="credientials.username"
                   lazy-rules
                   :rules="[required, short]"
-                  type="username"
+                  type="text"
                   label="Username"
                 >
                   <template v-slot:prepend>
@@ -164,7 +164,6 @@ async function onSubmit() {
                   </template>
                   <template v-slot:append>
                     <q-icon
-                      :name="visibilityIcon"
                       @click="changePasswordView"
                       class="cursor-pointer"
                     />
@@ -186,7 +185,6 @@ async function onSubmit() {
                   </template>
                   <template v-slot:append>
                     <q-icon
-                      :name="visibilityIcon"
                       @click="reChangePasswordView"
                       class="cursor-pointer"
                     />
