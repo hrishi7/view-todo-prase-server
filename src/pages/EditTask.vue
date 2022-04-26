@@ -1,12 +1,17 @@
 <script setup lang="ts">
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useQuasar } from 'quasar';
 
 import ContainerSection from 'src/components/ContainerSection.vue';
 import { useTaskStore } from 'src/stores/task';
 import { showNotify } from 'src/utils/common';
+import Task from 'src/types';
+
+type Mutable<Type> = {
+  -readonly [Key in keyof Type]: Type[Key];
+};
 
 
 const taskStore = useTaskStore();
@@ -15,7 +20,11 @@ const route = useRoute();
 const q = useQuasar();
 
 const taskId = route.params.id as string;
-const task = ref(taskStore.task ? taskStore.task.attributes : { title: '', description: '', completed: false });
+const task = ref<Mutable<Task>>(taskStore.task ? {
+  title: taskStore.task.attributes['title'], description: taskStore.task.attributes['description'],
+  completed: taskStore.task.attributes['completed']
+} :
+  { title: '', description: '', completed: false });
 
 onMounted(async () => {
   if (taskId) {
@@ -27,6 +36,14 @@ onMounted(async () => {
     }
   }
 });
+
+watch(taskStore, (newVal) => {
+  task.value = newVal.task ? {
+    title: newVal.task.attributes['title'], description: newVal.task.attributes['description'],
+    completed: newVal.task.attributes['completed']
+  } :
+    { title: '', description: '', completed: false }
+})
 
 const onSubmit = async () => {
   const response = await taskStore.editTask(taskId, task.value);

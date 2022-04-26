@@ -7,6 +7,7 @@ interface PropsType {
 const props = defineProps<PropsType>();
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const emits = defineEmits<{
   (e: 'delete', id: string): void
   (e: 'edit', id: string): void
