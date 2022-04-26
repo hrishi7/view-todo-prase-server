@@ -1,16 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { RouteRecordRaw } from 'vue-router';
-import { checkAuthentication } from 'src/utils/privateRoutes';
+import { isLoggedIn } from 'src/services/auth';
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '/', component: () => import('pages/IndexPage.vue'), beforeEnter: (to, from, next) => checkAuthentication(to, from, next) },
-      { path: '/all', component: () => import('pages/IndexPage.vue'), beforeEnter: (to, from, next) => checkAuthentication(to, from, next) },
-      { path: '/new', component: () => import('pages/NewTask.vue'), beforeEnter: (to, from, next) => checkAuthentication(to, from, next) },
-      { path: '/edit/:id', component: () => import('pages/EditTask.vue'), props: { default: true }, beforeEnter: (to, from, next) => checkAuthentication(to, from, next) },
-      { path: '/authentication', component: () => import('pages/Authentication.vue'), props: { default: true }, beforeEnter: (to, from, next) => checkAuthentication(to, from, next) },
+      { path: '/', component: () => import('pages/IndexPage.vue'), beforeEnter: (to, from) => isLoggedIn() ? true : false },
+      { path: '/all', component: () => import('pages/IndexPage.vue'), beforeEnter: (to, from) => isLoggedIn() ? true : false },
+      { path: '/new', component: () => import('pages/NewTask.vue'), beforeEnter: (to, from) => isLoggedIn() ? true : false },
+      { path: '/edit/:id', component: () => import('pages/EditTask.vue'), props: { default: true }, beforeEnter: (to, from) => isLoggedIn() ? true : false },
+      { path: '/authentication', component: () => import('pages/Authentication.vue'), beforeEnter: (to, from) => !isLoggedIn() ? true : false },
     ],
   },
 

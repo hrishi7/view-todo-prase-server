@@ -1,15 +1,18 @@
 <script setup lang="ts">
+
 import { reactive, ref } from '@vue/reactivity';
-import { logIn, signUp } from 'src/services/auth';
-
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
+import { logIn, signUp } from 'src/services/auth';
 import { required, short, isEmail } from 'src/utils/auth';
 import { showNotify } from 'src/utils/common';
-import { useQuasar } from 'quasar';
 
 type FormView = 'SIGNIN' | 'SIGNUP';
 type PasswordViewType = 'text' | 'password';
+
+const q = useQuasar();
+const router = useRouter();
 
 const credientials = reactive({
   email: '',
@@ -17,15 +20,13 @@ const credientials = reactive({
   username: '',
   password: '',
 });
-const q = useQuasar();
 const rePassword = ref('');
 const submitting = ref(false);
 const formView = ref<FormView>('SIGNUP');
 const passwordFieldView = ref<PasswordViewType>('password');
-
 const rePasswordFieldView = ref<PasswordViewType>('password');
 
-const router = useRouter();
+
 
 function changeView() {
   if (formView.value == 'SIGNUP') formView.value = 'SIGNIN';
@@ -86,10 +87,7 @@ async function onSubmit() {
 
 <template>
   <q-layout view="lHh Lpr fff">
-    <q-page
-      class="row justify-center items-center"
-      style="background: linear-gradient(#8274c5, #5a4a9f)"
-    >
+    <q-page class="row justify-center items-center" style="background: linear-gradient(#8274c5, #5a4a9f)">
       <div class="column q-pa-lg">
         <div class="row">
           <q-card square class="shadow-24" style="width: 400px; height: 600px">
@@ -97,117 +95,54 @@ async function onSubmit() {
               <h4 class="text-h5 text-white q-my-md">{{ formView }}</h4>
             </q-card-section>
             <q-card-section>
-              <q-fab
-                color="primary"
-                @click="changeView"
-                icon="add"
-                class="absolute"
-                style="top: 0; right: 12px; transform: translateY(-50%)"
-              >
-                <!-- <q-tooltip> {{ formView }} </q-tooltip> -->
+              <q-fab color="primary" @click="changeView" icon="add" class="absolute"
+                style="top: 0; right: 12px; transform: translateY(-50%)">
               </q-fab>
               <q-form @submit.prevent.stop="onSubmit" class="q-px-sm q-pt-xl">
-                <q-input
-                  ref="email"
-                  square
-                  clearable
-                  v-if="formView == 'SIGNUP'"
-                  v-model="credientials.email"
-                  type="email"
-                  lazy-rules
-                  :rules="[required, isEmail]"
-                  label="Email"
-                >
+                <q-input ref="email" square clearable v-if="formView == 'SIGNUP'" v-model="credientials.email"
+                  type="email" lazy-rules :rules="[required, isEmail]" label="Email">
                   <template v-slot:prepend>
                     <q-icon name="email" />
                   </template>
                 </q-input>
-                <q-input
-                  ref="name"
-                  v-if="formView == 'SIGNUP'"
-                  square
-                  clearable
-                  v-model="credientials.name"
-                  type="text"
-                  label="Full Name"
-                >
+                <q-input ref="name" v-if="formView == 'SIGNUP'" square clearable v-model="credientials.name" type="text"
+                  label="Full Name">
                   <template v-slot:prepend>
                     <q-icon name="person" />
                   </template>
                 </q-input>
-                <q-input
-                  ref="username"
-                  square
-                  clearable
-                  v-model="credientials.username"
-                  lazy-rules
-                  :rules="[required, short]"
-                  type="text"
-                  label="Username"
-                >
+                <q-input ref="username" square clearable v-model="credientials.username" lazy-rules
+                  :rules="[required, short]" type="text" label="Username">
                   <template v-slot:prepend>
                     <q-icon name="person" />
                   </template>
                 </q-input>
-                <q-input
-                  ref="password"
-                  square
-                  clearable
-                  v-model="credientials.password"
-                  :type="passwordFieldView"
-                  lazy-rules
-                  :rules="[required, short]"
-                  label="Password"
-                >
+                <q-input ref="password" square clearable v-model="credientials.password" :type="passwordFieldView"
+                  lazy-rules :rules="[required, short]" label="Password">
                   <template v-slot:prepend>
                     <q-icon name="lock" />
                   </template>
                   <template v-slot:append>
-                    <q-icon
-                      @click="changePasswordView"
-                      class="cursor-pointer"
-                    />
+                    <q-icon @click="changePasswordView" class="cursor-pointer" />
                   </template>
                 </q-input>
-                <q-input
-                  ref="password2"
-                  v-if="formView == 'SIGNUP'"
-                  square
-                  clearable
-                  v-model="rePassword"
-                  :type="rePasswordFieldView"
-                  lazy-rules
-                  :rules="[required, short, diffPassword]"
-                  label="Re Enter Password"
-                >
+                <q-input ref="password2" v-if="formView == 'SIGNUP'" square clearable v-model="rePassword"
+                  :type="rePasswordFieldView" lazy-rules :rules="[required, short, diffPassword]"
+                  label="Re Enter Password">
                   <template v-slot:prepend>
                     <q-icon name="lock" />
                   </template>
                   <template v-slot:append>
-                    <q-icon
-                      @click="reChangePasswordView"
-                      class="cursor-pointer"
-                    />
+                    <q-icon @click="reChangePasswordView" class="cursor-pointer" />
                   </template>
                 </q-input>
-                <q-btn
-                  unelevated
-                  size="lg"
-                  color="secondary"
-                  type="submit"
-                  class="full-width text-white"
-                  :label="formView"
-                  :loading="submitting"
-                />
+                <q-btn unelevated size="lg" color="secondary" type="submit" class="full-width text-white"
+                  :label="formView" :loading="submitting" />
               </q-form>
             </q-card-section>
 
             <q-card-section class="text-center q-pa-sm">
-              <p
-                class="text-grey-6 cursor-pointer"
-                v-if="formView == 'SIGNIN'"
-                @click="changeView"
-              >
+              <p class="text-grey-6 cursor-pointer" v-if="formView == 'SIGNIN'" @click="changeView">
                 Create Account?
               </p>
               <p class="text-grey-6 cursor-pointer" v-else @click="changeView">

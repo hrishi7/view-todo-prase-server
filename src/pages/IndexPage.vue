@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { getTasks, remove } from 'src/services/task';
+
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
+
 import ContainerSection from '../components/ContainerSection.vue';
 import TaskCard from 'src/components/TaskCard.vue';
 import { useTaskStore } from 'src/stores/task';
 import { showNotify } from 'src/utils/common';
-import { useQuasar } from 'quasar';
+
 
 type FilterType = 'All' | 'Pending' | 'Completed';
 
@@ -18,14 +20,13 @@ const q = useQuasar();
 const options = ['All', 'Pending', 'Completed'];
 
 const deletedId = ref('');
-const modalActive = ref(false);
 const model = ref<FilterType>('All');
 
 //place for conputed
 //place for watcher methods
 
 onMounted(async () => {
-  let response = await getTasks();
+  let response = await taskStore.getTasks();
   if (response.success) {
     showNotify(q, response.message, 'positive', 'success');
   } else {
@@ -33,23 +34,29 @@ onMounted(async () => {
   }
 });
 
-const toggleModal = () => {
-  modalActive.value = !modalActive.value;
-};
-
 
 function deleteTask(id: string) {
   deletedId.value = id;
-  toggleModal();
+  // toggleModal();
+  q.dialog({
+    title: 'Confirm',
+    message: 'Are You Sure you want to delete?',
+    cancel: true,
+    persistent: true
+  }).onOk(() => {
+    if (deletedId.value != '') {
+      deleteTaskConfirm(deletedId.value);
+    }
+  }).onCancel(() => {
+    deletedId.value = '';
+  }).onDismiss(() => {
+    //nothing as of now
+  })
+
 }
-function confirmDialog() {
-  toggleModal();
-  if (deletedId.value != '') {
-    deleteTaskConfirm(deletedId.value);
-  }
-}
+
 async function deleteTaskConfirm(id: string) {
-  let response = await remove(id);
+  let response = await taskStore.deleteTask(id);
   if (response.success) {
     showNotify(q, response.message, 'positive', 'success');
   } else {
@@ -78,13 +85,8 @@ function applyFilter() {
         <div class="col-9" style="align-self: center">
           <div class="row">
             <div class="col-6">
-              <q-select
-                outlined
-                v-model="model"
-                :options="options"
-                label="Select Filter"
-                @update:model-value="applyFilter()"
-              />
+              <q-select outlined v-model="model" :options="options" label="Select Filter"
+                @update:model-value="applyFilter()" />
             </div>
             <div class="col-6 add-btn">
               <q-btn round color="positive" icon="add" to="/new"></q-btn>
@@ -92,27 +94,9 @@ function applyFilter() {
           </div>
         </div>
       </div>
-      <TaskCard
-        v-for="(task, index) in applyFilter()"
-        :key="index"
-        :task="task"
-        @deleteTask="deleteTask"
-        :editTask="editTask"
-      />
+      <TaskCard v-for="(task, index) in applyFilter()" :key="index" :task="task" @delete="deleteTask"
+        @edit="editTask" />
       <div v-if="taskStore.tasks.length == 0">You have no Tasks..</div>
-
-      <q-dialog v-model="modalActive" persistent>
-        <q-card>
-          <q-card-section class="row items-center">
-            <q-avatar icon="info" color="primary" text-color="white" />
-            <span class="q-ml-sm">Are You Sure you want to delete?</span>
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn flat label="No" color="primary" @click="toggleModal" />
-            <q-btn flat label="Yes" color="primary" @click="confirmDialog" />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
     </ContainerSection>
   </q-page>
 </template>

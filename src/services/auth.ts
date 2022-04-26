@@ -3,7 +3,7 @@ import Credential from '../types/auth';
 
 type LoginCred = Omit<Credential, 'email'>
 
-export const signUp = async (credientials: Credential) => {
+export async function signUp(credientials: Credential) {
     try {
         const user: Parse.User = new Parse.User();
         const response = await user.signUp(credientials)
@@ -18,7 +18,7 @@ export const signUp = async (credientials: Credential) => {
     }
 }
 
-export const logIn = async (credientials: LoginCred) => {
+export async function logIn(credientials: LoginCred) {
     console.log(credientials)
     try {
         const response = await Parse.User.logIn(credientials.username, credientials.password)
@@ -33,7 +33,7 @@ export const logIn = async (credientials: LoginCred) => {
     }
 }
 
-export const logOut = async () => {
+export async function logOut() {
     try {
         await Parse.User.logOut()
         const currentUser = Parse.User.current();  // this will now be null
@@ -45,10 +45,10 @@ export const logOut = async () => {
 
     } catch (err) {
         const error = err as Parse.Error;
-        return { success: false, message: 'Server Error! try again later'+ error.message }
+        return { success: false, message: 'Server Error! try again later' + error.message }
     }
 }
 
-export const isLoggedIn = () => {
+export function isLoggedIn() {
     return Parse.User.current() !== null ? true : false
 }
