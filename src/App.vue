@@ -1,5 +1,7 @@
 <template>
-  <router-view />
+  <div class="bg-todo">
+    <router-view :class="{ 'q-mx-auto': true }" />
+  </div>
 </template>
 
 <script lang="ts">

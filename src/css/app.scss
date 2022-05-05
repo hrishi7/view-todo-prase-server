@@ -1,0 +1,242 @@
+/* app global css */
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+/* Reset head tags style to browser defaults */
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: normal;
+    letter-spacing: -0.01562em;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: normal;
+    letter-spacing: -0.00833em;
+}
+
+h3 {
+    font-size: 1.17rem;
+    font-weight: bold;
+    line-height: normal;
+    letter-spacing: normal;
+}
+
+h4 {
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: normal;
+    letter-spacing: 0.00735em;
+}
+
+h5 {
+    font-size: 0.83rem;
+    font-weight: bold;
+    line-height: normal;
+    letter-spacing: normal;
+}
+
+h6 {
+    font-size: 0.67rem;
+    font-weight: bold;
+    line-height: normal;
+    letter-spacing: 0.0125em;
+}
+
+p {
+    margin: 0 0 1rem;
+}
+
+.bg-todo {
+    background: #F2F4F4;
+}
+
+.bg-input-bg {
+    background: #fcfbfc;
+}
+
+.text-input-label {
+    color: #1F3847;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.v-border-circle {
+    border-radius: 50%;
+}
+
+.v-text-dark {
+    color: #062132;
+
+}
+
+.v-text-medium {
+    color: #516470;
+}
+
+.v-text-light {
+    color: #9BA6AD;
+}
+
+.v-text-disabled {
+    color: #CDD3D6;
+}
+
+.v-text-title {
+    color: #006069;
+}
+
+.primary-1 {
+    color: $primary-1 !important;
+}
+
+.primary-2 {
+    color: $primary-2 !important;
+}
+
+.primary-3 {
+    color: $primary-3 !important;
+}
+
+.primary-4 {
+    color: $primary-4 !important;
+}
+
+.primary-5 {
+    color: $primary-5 !important;
+}
+
+.primary-6 {
+    color: $primary-6 !important;
+}
+
+.primary-7 {
+    color: $primary-7 !important;
+}
+
+.primary-8 {
+    color: $primary-8 !important;
+}
+
+.primary-9 {
+    color: $primary-9 !important;
+}
+
+.bg-primary-1 {
+    background-color: $primary-1 !important;
+}
+
+.bg-primary-2 {
+    background-color: $primary-2 !important;
+}
+
+.bg-primary-3 {
+    background-color: $primary-3 !important;
+}
+
+.bg-primary-4 {
+    background-color: $primary-4 !important;
+}
+
+.bg-primary-5 {
+    background-color: $primary-5 !important;
+}
+
+.bg-primary-6 {
+    background-color: $primary-6 !important;
+}
+
+.bg-primary-7 {
+    background-color: $primary-7 !important;
+}
+
+.bg-primary-8 {
+    background-color: $primary-8 !important;
+}
+
+.bg-primary-9 {
+    background-color: $primary-9 !important;
+}
+
+.secondary-1 {
+    color: $secondary-1 !important;
+}
+
+.secondary-2 {
+    color: $secondary-2 !important;
+}
+
+.secondary-3 {
+    color: $secondary-3 !important;
+}
+
+.secondary-4 {
+    color: $secondary-4 !important;
+}
+
+.secondary-5 {
+    color: $secondary-5 !important;
+}
+
+.secondary-6 {
+    color: $secondary-6 !important;
+}
+
+.secondary-7 {
+    color: $secondary-7 !important;
+}
+
+.secondary-8 {
+    color: $secondary-8 !important;
+}
+
+.secondary-9 {
+    color: $secondary-9 !important;
+}
+
+.secondary-10 {
+    color: $secondary-10 !important;
+}
+
+.bg-secondary-1 {
+    background-color: $secondary-1 !important;
+}
+
+.bg-secondary-2 {
+    background-color: $secondary-2 !important;
+}
+
+.bg-secondary-3 {
+    background-color: $secondary-3 !important;
+}
+
+.bg-secondary-4 {
+    background-color: $secondary-4 !important;
+}
+
+.bg-secondary-5 {
+    background-color: $secondary-5 !important;
+}
+
+.bg-secondary-6 {
+    background-color: $secondary-6 !important;
+}
+
+.bg-secondary-7 {
+    background-color: $secondary-7 !important;
+}
+
+.bg-secondary-8 {
+    background-color: $secondary-8 !important;
+}
+
+.bg-secondary-9 {
+    background-color: $secondary-9 !important;
+}
+
+.bg-secondary-10 {
+    background-color: $secondary-10 !important;
+}

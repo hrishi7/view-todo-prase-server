@@ -1,12 +1,11 @@
 import { route } from 'quasar/wrappers';
-
 import {
   createMemoryHistory,
   createRouter,
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
-
+import Parse from 'parse/dist/parse.min';
 import routes from './routes';
 
 /*
@@ -32,5 +31,27 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
+
+  // Router.beforeEach((to, from) => {
+  //   /**
+  //    * Routes that don't require authentication
+  //    */
+  //   if (/^\/login|\/sign-up/g.test(to.path)) return true;
+
+  //   /**
+  //    * Routes that require authentication
+  //    */
+  //   //auth guard
+  //   const localUser = Parse.User.current();
+  //   if (!localUser) {
+  //     if (/^\/sign-up/g.test(to.query.next as string)) return { path: to.query.next };
+
+  //     return {
+  //       path: '/login',
+  //       query: to.path === '/' ? (!(to.query.next as string)?.startsWith('/login') ? to.query : {}) : { next: to.fullPath }
+  //     }
+  //   }
+  //   return true;
+  // })
   return Router;
 });

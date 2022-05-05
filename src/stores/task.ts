@@ -1,27 +1,34 @@
 import { defineStore } from 'pinia';
-import type Task from 'src/types';
 import Parse from '../config/config';
+import loglevel from 'loglevel';
 
+type Tasks = TaskState['tasks'];
 
-interface State {
-  tasks: Array<Parse.Object<Task>>;
-  task: Parse.Object<Task> | null;
-  page: number;
-  limit: number;
-}
-type Tasks = State['tasks'];
-
-export const useTaskStore = defineStore('task', {
-  state: (): State => ({
+export const useTaskStore = defineStore('tasks', {
+  state: (): TaskState => ({
     tasks: [],
-    task: null,
     page: 0,
     limit: 10
   }),
   getters: {
-    getFinishedList: (state: State): Tasks => state.tasks.filter(x => x.get('completed')),
-    getPendingList: (state: State): Tasks => state.tasks.filter(x => !x.get('completed')),
-    getAllList: (state: State): Tasks => [...state.tasks.filter(x => !x.get('completed')), ...state.tasks.filter(x => x.get('completed'))]
+    /**
+     * Return all tasks in their attributes form
+     */
+    tasksAttributes: state => state.tasks.map(e => ({ id: e.id, ...e.attributes })),
+
+    /**
+     * get Task by Id
+     */
+    task: state => (id: string) => state.tasks.find(e => e.id === id),
+    /**
+     * get specific task attributes
+     */
+    taskAttributes: (state) => (id: string) => {
+      return state.tasks.find(e => e.id === id)?.attributes as any
+    },
+    getFinishedList: (state: TaskState): Tasks => state.tasks.filter(x => x.get('completed')),
+    getPendingList: (state: TaskState): Tasks => state.tasks.filter(x => !x.get('completed')),
+    getAllList: (state: TaskState): Tasks => [...state.tasks.filter(x => !x.get('completed')), ...state.tasks.filter(x => x.get('completed'))]
   },
   actions: {
     async addTask(newTask: Task) {
@@ -109,25 +116,8 @@ export const useTaskStore = defineStore('task', {
 
 
     },
-    async getTask(id: string) {
-      try {
-        const q = new Parse.Query('Task') as Parse.Query;
-        const response = await q.get(id) as Parse.Object<Task>;
-        if (response) {
-          this.task = response;
-          return { success: true, message: 'data Found' }
-        } else {
-          return { success: false, message: 'Server Error! try again later' }
-        }
-      } catch (err) {
-        const error = err as Parse.Error;
-        return { success: false, message: 'Server Error! try again later' + error.message }
-      }
-
-    },
     resetStore() {
       this.tasks = [];
-      this.task = null;
       this.page = 0;
       this.limit = 10;
     }

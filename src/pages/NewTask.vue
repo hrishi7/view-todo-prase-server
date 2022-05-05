@@ -43,7 +43,7 @@ const onSubmit = async () => {
             <q-input v-model="task.title" label="Title *" hint="Kitchen cleaning, Car Washing.." lazy-rules :rules="[
               (val) => (val !== null && val !== '') || 'Please type title',
             ]" />
-            <q-input v-model="task.description" label="Description" />
+            <q-input type="textarea" v-model="task.description" label="Description" />
 
             <q-toggle v-model="task.completed" label="Task Completed ?" />
 

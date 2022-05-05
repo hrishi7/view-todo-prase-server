@@ -18,5 +18,14 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "johnsoncodehk.volar"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "johnsoncodehk.volar"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
   }
 }

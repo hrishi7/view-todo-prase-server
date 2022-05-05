@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import Parse from 'parse/dist/parse.min';
+
+import Parse from 'src/config/config';
 import Task from 'src/types';
+
 interface PropsType {
   task: Parse.Object<Task>;
 };
