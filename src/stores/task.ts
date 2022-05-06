@@ -6,7 +6,7 @@ type Tasks = TaskState['tasks'];
 
 export const useTaskStore = defineStore('tasks', {
   state: (): TaskState => ({
-    tasks: [],
+    tasks: [] as Parse.Object<TaskAttributes>[],
     page: 0,
     limit: 10
   }),
@@ -14,7 +14,7 @@ export const useTaskStore = defineStore('tasks', {
     /**
      * Return all tasks in their attributes form
      */
-    tasksAttributes: state => state.tasks.map(e => ({ id: e.id, ...e.attributes })),
+    tasksAttributes: state => state.tasks.map(e => ({ ...e.attributes })),
 
     /**
      * get Task by Id
@@ -24,98 +24,95 @@ export const useTaskStore = defineStore('tasks', {
      * get specific task attributes
      */
     taskAttributes: (state) => (id: string) => {
-      return state.tasks.find(e => e.id === id)?.attributes as any
+      return state.tasks.find(e => e.id === id)?.attributes as TaskAttributes
     },
     getFinishedList: (state: TaskState): Tasks => state.tasks.filter(x => x.get('completed')),
     getPendingList: (state: TaskState): Tasks => state.tasks.filter(x => !x.get('completed')),
     getAllList: (state: TaskState): Tasks => [...state.tasks.filter(x => !x.get('completed')), ...state.tasks.filter(x => x.get('completed'))]
   },
   actions: {
-    async addTask(newTask: Task) {
+    async addTask(attributes: Task): Promise<void> {
+      const task = new Parse.Object('Task', attributes) as Parse.Object<TaskAttributes>;
       try {
-        const task = new Parse.Object('Task') as Parse.Object<Task>;
-        const response = await task.save(newTask) as Parse.Object<Task>;
-        if (response) {
-          this.tasks.push(response);
-          return { success: true, message: 'Task Added. Relax!' }
-        } else {
-          return { success: false, message: 'Server Error! try again later' }
+        await task.save();
+
+        //fetch task again to get the updated attributes
+        await task.fetch();
+        this.tasks.push(task);
+
+      } catch (error) {
+        loglevel.error(error);
+        if (error instanceof Parse.Error || error instanceof Error) {
+          throw error.message
         }
-      } catch (err) {
-        const error = err as Parse.Error;
-        return { success: false, message: 'Server Error! try again later' + error.message }
+        if (typeof error === 'string') {
+          throw error;
+        }
+        if (typeof error === 'object') {
+          throw JSON.stringify(error);
+        }
       }
     },
-    async editTask(id: string, updatedInfo: Task | null) {
+
+    async editTask(taskid: string, attributes: TaskAttributes) {
+      const index = this.tasks.findIndex(e => e.id === taskid);
+      //cloning and replacing task at index is required for reactivity
+      const task = index > -1 ? this.tasks[index].clone() : null;
+      if (!task) throw new Error('Task not found');
+      task.id = taskid;
+      task.set(attributes);
+
       try {
-        const q = new Parse.Query('Task') as Parse.Query;
-        const response = await q.get(id) as Parse.Object<Task>;
-        if (updatedInfo && updatedInfo.title) {
-          response.set('title', updatedInfo.title);
+        await task.save();
+        //fetch again to get updated attributes
+        await task.fetch();
+      } catch (error) {
+        loglevel.error(error);
+        if (error instanceof Parse.Error || error instanceof Error) {
+          throw error.message
         }
-        if (updatedInfo && updatedInfo.description) {
-          response.set('description', updatedInfo.description);
+        if (typeof error === 'string') {
+          throw error;
         }
-        if (updatedInfo && updatedInfo.completed != undefined) {
-          response.set('completed', updatedInfo.completed);
+        if (typeof error === 'object') {
+          throw JSON.stringify(error);
         }
-        const updatedResponse = await response.save() as Parse.Object<Task>;
-        if (updatedResponse) {
-          const index = this.tasks.findIndex((item) => item.id == id)
-          if (index != -1) {
-            this.tasks[index] = updatedResponse
-          }
-          return { success: true, message: 'Task Updated' }
-        } else {
-          return { success: false, message: 'Server Error! try again later' }
-        }
-      } catch (err) {
-        const error = err as Parse.Error;
-        return { success: false, message: 'Server Error! try again later' + error.message }
+      } finally {
+        this.tasks[index] = task
       }
-
-
     },
-    async deleteTask(id: string) {
+
+    async deleteTask(taskid: string) {
+      const task = this.tasks.find((task) => task.id === taskid);
+      if (!task) {
+        throw new Error('Task not found');
+      }
       try {
-        const q = new Parse.Query('Task') as Parse.Query;
-        const response = await q.get(id) as Parse.Object<Task>;
-        const deletedResponse: Parse.Object<Task> = await response.destroy();
-        if (deletedResponse) {
-          const index = this.tasks.findIndex((item) => item.id == id)
-          if (index != -1) {
-            this.tasks.splice(index, 1)
-          }
-          return { success: true, message: 'Tasked Removed..' }
-        }
-        else {
-          return { success: false, message: 'Server Error! try again later' }
-        }
-      } catch (err) {
-        const error = err as Parse.Error;
-        return { success: false, message: 'Server Error! try again later' + error.message }
+        await task.destroy();
+      } catch (error) {
+        loglevel.error(error);
+        throw new Error('Error deleting Task')
+      } finally {
+        this.tasks = this.tasks.filter((task) => task.id !== taskid)
       }
-
-
     },
+
     async getTasks() {
+      const query = new Parse.Query<Parse.Object<TaskAttributes>>('Task');
       try {
-        const query = new Parse.Query('Task') as Parse.Query;
-        const response = await query.find() as Array<Parse.Object<Task>>;
-        if (response) {
-          this.tasks = response
-          this.page = this.page + 1
-          return { success: true, message: `${response.length} data Fetched` }
-        } else {
-          return { success: false, message: 'Server Error! try again later' }
-        }
-      } catch (err) {
-        const error = err as Parse.Error;
-        return { success: false, message: 'Server Error! try again later' + error.message }
+        const response = await query.find();
+        this.tasks = response
+        this.page = this.page + 1
+      } catch (error: unknown) {
+        loglevel.error(error);
+        /**
+         * possible errors
+         * Network / backend / any other
+         */
+        throw new Error('Error fetching Tasks')
       }
-
-
     },
+
     resetStore() {
       this.tasks = [];
       this.page = 0;

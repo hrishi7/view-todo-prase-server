@@ -1,8 +1,8 @@
 <template>
-    <q-form ref="formRef" class="q-pa-md column q-gutter-y-sm">
-        <q-input v-model="_task.title" label="Titlee" :rules="[required, val => isLength(val, { min: 2, max: 15 })]" />
-        <q-input v-model="_task.description" type="textarea" label="Description" :rules="[required]" />
-        <q-toggle v-model="_task.completed" color="green" :label="_task.completed ? 'completed' : 'pending'"
+    <q-form ref="taskFormRef" class="q-pa-md column q-gutter-y-sm">
+        <v-input v-model="_task.title" label="Titlee" :rules="[required, val => isLength(val, { min: 1, max: 50 })]" />
+        <v-input v-model="_task.description" type="textarea" label="Description" :rules="[required]" />
+        <v-toggle v-model="_task.completed" color="green" :label="_task.completed ? 'Completed' : 'Pending'"
             right-label />
 
     </q-form>
@@ -10,13 +10,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import VInput from '../../components/custom/VInput.vue';
+import VToggle from '../../components/custom/VToggle.vue';
 import { required, isLength } from 'src/utils/validation-rules';
 
 interface Props {
     task?: {
-        title: Task['title'];
-        description: Task['description'];
-        completed?: boolean;
+        title: TaskAttributes['title'];
+        description: TaskAttributes['description'];
+        completed: TaskAttributes['completed'];
     }
 }
 
@@ -30,10 +31,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const _task = ref(props.task);
 
-const formRef = ref();
+const taskFormRef = ref();
 
 async function save() {
-    if (!await formRef.value.validate()) return;
+    if (!await taskFormRef.value.validate()) return;
 
     return _task.value;
 }

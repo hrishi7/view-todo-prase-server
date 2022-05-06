@@ -6,14 +6,29 @@
         <q-toolbar-title>
           {{ $route.meta.displayName }}
         </q-toolbar-title>
-        <q-btn label="Help" color="bg-white" flat no-caps stretch icon="help_outline" />
         <q-btn-dropdown no-caps flat stretch class="text-subtitle1">
           <template #label>
             <q-avatar class="q-mr-sm" color="primary" text-color="white">
-              {{ getInitials(userStore.user?.get('name') ?? 'TodoApp') }}
+              {{ getInitials(getAttribute('firstName') ?? 'TodoApp') }}
             </q-avatar>
-            Hello {{ userStore.user?.get('firstName') }}
+            Hello {{ getAttribute('firstName') }}
           </template>
+          <q-list>
+            <q-item>
+              <q-item-section>
+                <q-item-label>{{ getAttribute('email') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-close-popup @click="signOut">
+              <q-item-section avatar>
+                <q-avatar icon="logout" color="secondary" text-color="white" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Logout</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
         </q-btn-dropdown>
       </q-toolbar>
     </q-header>
@@ -26,11 +41,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { getInitials } from 'src/utils';
 import { useUserStore } from 'src/stores/user';
+import { useRouter } from 'vue-router';
+import { useQuasar, } from 'quasar';
+import Parse from '../config/config';
+
+const router = useRouter();
+const $q = useQuasar();
 
 const userStore = useUserStore();
+
+function getAttribute(field: string) {
+  return Parse.User.current()?.get(field)
+}
+
+async function signOut() {
+  try {
+    await userStore.logout();
+    router.replace('/login')
+  } catch (error: any) {
+    $q.notify({
+      message: error.message,
+      type: 'negative',
+      position: 'bottom',
+      icon: 'error'
+    });
+  }
+}
 </script>
 <style lang="scss">
 .plan-card {
@@ -40,55 +78,3 @@ const userStore = useUserStore();
 }
 </style>
 
-
-
-<!-- <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-toolbar-title to=""> Todo App </q-toolbar-title>
-        <q-space />
-        <q-btn to="/" flat round dense icon="home" />
-        <q-btn
-          v-if="!isAuthrorized"
-          to="/authentication"
-          flat
-          round
-          dense
-          icon="group_add"
-        />
-        <q-btn
-          v-if="isAuthrorized"
-          @click="handleLogout"
-          flat
-          round
-          dense
-          icon="logout"
-        />
-      </q-toolbar>
-    </q-header>
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
-</template>
-
-<script setup lang="ts">
-import { onMounted, onUpdated, ref } from '@vue/runtime-core';
-import { isLoggedIn, logOut } from 'src/services/auth';
-import { useRouter } from 'vue-router';
-const isAuthrorized = ref(false);
-const router = useRouter();
-onMounted(() => {
-  isAuthrorized.value = isLoggedIn();
-});
-
-onUpdated(() => {
-  isAuthrorized.value = isLoggedIn();
-});
-
-function handleLogout() {
-  logOut();
-  router.push('/authentication');
-}
-</script> -->

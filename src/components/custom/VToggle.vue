@@ -11,7 +11,8 @@
       </slot>
     </div>
     <q-space />
-    <q-toggle ref="qToggleRef" outlined v-bind="attrs" :label="void 0" bg-color="grey-1">
+    <q-toggle ref="qToggleRef" :model-value="props.modelValue" outlined v-bind="attrs" :label="void 0"
+      bg-color="grey-1">
       <template v-for="(_, slot) of slots" #[slot]="scope">
         <slot :name="slot" v-bind="scope ?? {}" />
       </template>
@@ -28,7 +29,6 @@ type QToggleProps = import('quasar').QToggleProps;
 // defineProps only accepts interface types. so we need to convert type to an interface
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Props extends QToggleProps {
-  modelvalue?: boolean,
   caption?: string;
 }
 
@@ -39,8 +39,8 @@ const attrs = computed(() => {
   const { class: _, ...others } = useAttrs();
   return others;
 });
-// @ts-ignore 
-const slots: { [key: unknown]: any } = computed(() => {
+
+const slots = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { caption: _, ...others } = useSlots();
   return others;

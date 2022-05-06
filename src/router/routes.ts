@@ -19,7 +19,10 @@ const components = {
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: components.Loading,
+    component: components.AuthLayout,
+    children: [
+      { path: '', component: components.Login, meta: { displayName: 'Login' } },
+    ],
   },
   {
     path: '/login',

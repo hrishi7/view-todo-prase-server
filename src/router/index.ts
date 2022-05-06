@@ -5,7 +5,7 @@ import {
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
-import Parse from 'parse/dist/parse.min';
+// import Parse from '../config/config';
 import routes from './routes';
 
 /*
@@ -33,25 +33,33 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   // Router.beforeEach((to, from) => {
+  //   const localUser = Parse.User.current();
   //   /**
   //    * Routes that don't require authentication
   //    */
-  //   if (/^\/login|\/sign-up/g.test(to.path)) return true;
+  //   if (/^\/login|\/sign-up/g.test(to.path)) {
+  //     if (!localUser) return true;
+  //     else return {
+  //       path: "/tasks"
+  //     }
+  //   }
 
   //   /**
   //    * Routes that require authentication
   //    */
   //   //auth guard
-  //   const localUser = Parse.User.current();
+
   //   if (!localUser) {
   //     if (/^\/sign-up/g.test(to.query.next as string)) return { path: to.query.next };
 
   //     return {
   //       path: '/login',
-  //       query: to.path === '/' ? (!(to.query.next as string)?.startsWith('/login') ? to.query : {}) : { next: to.fullPath }
+  //       query: to.path === '/tasks' ? (!(to.query.next as string)?.startsWith('/login') ? to.query : {}) : { next: to.fullPath }
   //     }
   //   }
-  //   return true;
+  //   return {
+  //     path: "/tasks"
+  //   };
   // })
   return Router;
 });

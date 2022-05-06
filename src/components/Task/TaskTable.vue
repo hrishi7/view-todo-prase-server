@@ -24,7 +24,7 @@ import VTable from 'src/components/custom/VTable.vue';
 const $q = useQuasar();
 const taskStore = useTaskStore();
 
-const columns: QTableColumn<Parse.Object<Task>>[] = [
+const columns: QTableColumn<Parse.Object<TaskAttributes>>[] = [
     {
         name: 'title',
         label: 'Title',
@@ -43,7 +43,7 @@ const columns: QTableColumn<Parse.Object<Task>>[] = [
     {
         name: 'completed',
         label: 'Status',
-        field: val => val.get('completed'),
+        field: val => val.get('completed') ? 'completed' : 'Pending',
         align: 'center',
     }
 ];

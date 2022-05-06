@@ -24,7 +24,7 @@
                         <q-btn unelevated no-caps color="primary" label="Save" :loading="loading"
                             @click="updateTask($refs.taskDetailsRef)" />
                     </template>
-                    <component ref="taskeDetailsRef" :is="Component" :taskid="route.params.taskid" />
+                    <component ref="taskDetailsRef" :is="Component" :taskid="route.params.taskid" />
                 </right-drawer>
             </template>
         </router-view>
@@ -37,7 +37,9 @@ import { onMounted, ref, watch } from 'vue';
 import TaskTable from 'src/components/Task/TaskTable.vue';
 import RightDrawer from 'src/components/common/RightDrawer.vue';
 import TaskForm from '../components/Task/TaskForm.vue';
+import TaskDetails from '../components/Task/TaskDetails.vue';
 import VPage from 'components/custom/VPage.vue';
+import { Notify } from 'quasar';
 import loglevel from 'loglevel';
 import { useRouter } from 'vue-router';
 
@@ -48,6 +50,7 @@ const router = useRouter();
 const pageRef = ref();
 const loading = ref(false);
 const taskDetailsDrawerRef = ref();
+const taskFormRef = ref();
 
 watch(router.currentRoute, route => {
     if (route.name === 'taskDetails') {
@@ -56,7 +59,15 @@ watch(router.currentRoute, route => {
 }, { immediate: true });
 
 onMounted(async () => {
-    await taskStore.getTasks();
+    try {
+        await taskStore.getTasks();
+    } catch (error) {
+        Notify.create({
+            message: error instanceof Error ? error?.message : 'Something went wrong while fetching data',
+            type: 'error'
+        });
+    }
+
 })
 
 
@@ -67,7 +78,7 @@ async function add(taskFormRef: InstanceType<typeof TaskForm>, addDrawerRef: Ins
         if (!taskDetails) return;
 
         const { ...attributes } = taskDetails;
-        // await taskStore.addTask({ ...attributes });
+        await taskStore.addTask({ ...attributes });
 
         $q.notify({
             type: 'positive',
@@ -86,7 +97,7 @@ async function add(taskFormRef: InstanceType<typeof TaskForm>, addDrawerRef: Ins
     }
 }
 
-async function updateTask(taskDetailsRef: any) {
+async function updateTask(taskDetailsRef: InstanceType<typeof TaskDetails>) {
     loading.value = true;
     try {
         await taskDetailsRef.save();

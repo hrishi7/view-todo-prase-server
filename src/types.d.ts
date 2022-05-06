@@ -5,7 +5,30 @@ type Task = {
 }
 
 type TaskState = {
-    tasks: Array<Parse.Object<Task>>;
+    tasks: Array<Parse.Object<TaskAttributes>>;
     page: number;
     limit: number;
 }
+
+type TaskAttributes = {
+    id: string;
+    title: string;
+    description: string;
+    completed: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+type UserAttributes = {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    username: string;
+    password: string;
+    createdAt: Date,
+    updatedAt: Date,
+    sessionToken: string;
+}
+
+
